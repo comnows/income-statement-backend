@@ -1,11 +1,15 @@
 import "dotenv/config";
 import Fastify from "fastify";
-import { connectDB } from "./database/connect";
+import fastifyMongo from "@fastify/mongodb";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;
 
-fastify.register(connectDB);
+fastify.register(fastifyMongo, {
+  forceClose: true,
+  url: process.env.MONGO_URI,
+  database: process.env.DB_NAME,
+});
 
 const start = async () => {
   try {
