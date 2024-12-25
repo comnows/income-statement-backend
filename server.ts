@@ -1,6 +1,7 @@
 import "dotenv/config";
 import Fastify from "fastify";
 import fastifyMongo from "@fastify/mongodb";
+import authRoutes from "./routes/auth";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;
@@ -10,6 +11,8 @@ fastify.register(fastifyMongo, {
   url: process.env.MONGO_URI,
   database: process.env.DB_NAME,
 });
+
+fastify.register(authRoutes, { prefix: "/api/v1/auth" });
 
 const start = async () => {
   try {
