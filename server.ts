@@ -1,7 +1,11 @@
+import "dotenv/config";
 import Fastify from "fastify";
+import { connectDB } from "./database/connect";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;
+
+fastify.register(connectDB);
 
 const start = async () => {
   try {
