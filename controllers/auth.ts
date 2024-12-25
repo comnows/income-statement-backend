@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import bcrypt from "bcrypt";
+import { MongoError } from "mongodb";
 
 type RegisterBodyData = {
   name: string;
@@ -33,6 +34,10 @@ export const register = async (
       result: result?.insertedId,
     });
   } catch (error) {
+    if ((error as MongoError).code === 11000) {
+      return reply.status(400).send({ error: "Email already exists" });
+    }
+
     console.error("Error register: ", error);
     return reply.status(500).send({ error: "User create unsuccessful" });
   }
