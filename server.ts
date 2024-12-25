@@ -1,16 +1,26 @@
 import "dotenv/config";
 import Fastify from "fastify";
+import fastifyCookie, { type FastifyCookieOptions } from "@fastify/cookie";
 import fastifyMongo from "@fastify/mongodb";
+import fastifyJwt from "@fastify/jwt";
 import authRoutes from "./routes/auth";
 import { createIndexes } from "./database/users";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;
 
+fastify.register(fastifyCookie, {
+  secret: process.env.COOKIE_SECRET,
+} as FastifyCookieOptions);
+
 fastify.register(fastifyMongo, {
   forceClose: true,
   url: process.env.MONGO_URI,
   database: process.env.DB_NAME,
+});
+
+fastify.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET || "jwtsecret",
 });
 
 fastify.ready(async () => {
