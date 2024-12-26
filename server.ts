@@ -5,6 +5,7 @@ import connectDB from "./database/connect";
 import fastifyJwt from "@fastify/jwt";
 import authRoutes from "./routes/auth";
 import { createIndexes } from "./database/users";
+import accountRoutes from "./routes/account";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;
@@ -32,6 +33,7 @@ fastify.ready(async () => {
 });
 
 fastify.register(authRoutes, { prefix: "/api/v1/auth" });
+fastify.register(accountRoutes, { prefix: "/api/v1/accounts" });
 
 const start = async () => {
   try {
