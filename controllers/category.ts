@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ObjectId } from "mongodb";
+import { ParamsId } from "../libs/type";
 
 type CategoryData = {
   name: string;
@@ -7,6 +8,10 @@ type CategoryData = {
 
 type CreateCategoryRequestData = {
   Body: CategoryData;
+};
+
+type DeleteCategoryRequestData = {
+  Params: ParamsId;
 };
 
 export const createCategory = async (
@@ -33,5 +38,29 @@ export const createCategory = async (
     return reply.status(201).send({ category: result });
   } catch (error) {
     return reply.status(500).send({ error: "Category added unsuccessful" });
+  }
+};
+
+export const deleteCategory = async (
+  request: FastifyRequest<DeleteCategoryRequestData>,
+  reply: FastifyReply
+) => {
+  const { id } = request.params;
+  const { userId } = request.user;
+  const db = request.server.mongo.db;
+
+  try {
+    if (!db) {
+      return reply.status(500).send({ error: "Database not available" });
+    }
+
+    const result = await db.collection("categories").findOneAndDelete({
+      _id: new ObjectId(id),
+      createdBy: new ObjectId(userId),
+    });
+
+    return reply.status(200).send({ category: result });
+  } catch (error) {
+    return reply.status(500).send({ error: "Category deleted unsuccessful" });
   }
 };

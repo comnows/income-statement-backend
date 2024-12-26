@@ -10,3 +10,7 @@ declare module "@fastify/jwt" {
     user: UserPayload;
   }
 }
+
+export type ParamsId = {
+  id: string;
+};
