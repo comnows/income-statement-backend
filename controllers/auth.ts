@@ -82,7 +82,11 @@ export const login = async (
       { expiresIn: "1d" }
     );
 
-    reply.setCookie("token", token, { maxAge: 24 * 60 * 60, httpOnly: true });
+    reply.setCookie("token", token, {
+      maxAge: 24 * 60 * 60,
+      httpOnly: true,
+      path: "/",
+    });
 
     return reply.status(200).send({ user: { name: user.name }, token });
   } catch (error) {
