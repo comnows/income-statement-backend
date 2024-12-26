@@ -1,7 +1,7 @@
 import "dotenv/config";
 import Fastify from "fastify";
 import fastifyCookie, { type FastifyCookieOptions } from "@fastify/cookie";
-import fastifyMongo from "@fastify/mongodb";
+import connectDB from "./database/connect";
 import fastifyJwt from "@fastify/jwt";
 import authRoutes from "./routes/auth";
 import { createIndexes } from "./database/users";
@@ -13,11 +13,7 @@ fastify.register(fastifyCookie, {
   secret: process.env.COOKIE_SECRET,
 } as FastifyCookieOptions);
 
-fastify.register(fastifyMongo, {
-  forceClose: true,
-  url: process.env.MONGO_URI,
-  database: process.env.DB_NAME,
-});
+fastify.register(connectDB);
 
 fastify.register(fastifyJwt, {
   secret: process.env.JWT_SECRET || "jwtsecret",
