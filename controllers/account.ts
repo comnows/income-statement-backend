@@ -32,10 +32,14 @@ export const createAccount = async (
       return reply.status(500).send({ error: "Database not available" });
     }
 
-    const result = await db.collection("accounts").insertOne({
-      ...data,
-      createdBy: new ObjectId(userId),
-    });
+    const accountData = { ...data, createdBy: new ObjectId(userId) };
+    const result = await db
+      .collection("accounts")
+      .findOneAndUpdate(
+        accountData,
+        { $setOnInsert: accountData },
+        { upsert: true, returnDocument: "after" }
+      );
 
     return reply.status(201).send({ account: result });
   } catch (error) {
@@ -56,12 +60,10 @@ export const deleteAccount = async (
       return reply.status(500).send({ error: "Database not available" });
     }
 
-    const result = await db
-      .collection("accounts")
-      .findOneAndDelete({
-        _id: new ObjectId(id),
-        createdBy: new ObjectId(userId),
-      });
+    const result = await db.collection("accounts").findOneAndDelete({
+      _id: new ObjectId(id),
+      createdBy: new ObjectId(userId),
+    });
 
     return reply.status(200).send({ account: result });
   } catch (error) {
