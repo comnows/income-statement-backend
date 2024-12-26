@@ -17,6 +17,10 @@ fastify.register(connectDB);
 
 fastify.register(fastifyJwt, {
   secret: process.env.JWT_SECRET || "jwtsecret",
+  cookie: {
+    cookieName: "token",
+    signed: false,
+  },
 });
 
 fastify.ready(async () => {

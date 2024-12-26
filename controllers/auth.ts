@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import bcrypt from "bcrypt";
-import { MongoError, WithId } from "mongodb";
+import { MongoError } from "mongodb";
 
 type RegisterBodyData = {
   name: string;
@@ -77,7 +77,7 @@ export const login = async (
       return reply.status(401).send({ error: "Invalid credentials" });
     }
 
-    const token = fastify.jwt.sign(
+    const token = await reply.jwtSign(
       { userId: user._id, name: user.name },
       { expiresIn: "1d" }
     );
