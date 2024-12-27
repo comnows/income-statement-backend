@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth";
 import { createIndexes } from "./database/users";
 import accountRoutes from "./routes/account";
 import categoryRoutes from "./routes/category";
+import transactionRoutes from "./routes/transaction";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;
@@ -36,6 +37,7 @@ fastify.ready(async () => {
 fastify.register(authRoutes, { prefix: "/api/v1/auth" });
 fastify.register(accountRoutes, { prefix: "/api/v1/accounts" });
 fastify.register(categoryRoutes, { prefix: "/api/v1/categories" });
+fastify.register(transactionRoutes, { prefix: "/api/v1/transactions" });
 
 const start = async () => {
   try {
