@@ -26,9 +26,9 @@ type GetAllTransactionRequestData = {
 };
 
 type TransactionBodyData = {
-  title: string;
+  note?: string;
   type: string;
-  amount: string;
+  amount: number;
   category: string;
   account: string;
   date: Date;
