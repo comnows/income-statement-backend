@@ -1,3 +1,5 @@
+import { v4 as uuid } from "uuid";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { Filter } from "bad-words";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ObjectId } from "mongodb";
@@ -222,20 +224,47 @@ export const createTransaction = async (
   reply: FastifyReply
 ) => {
   const { userId } = request.user;
-  const { account, date, note, ...data } = request.body;
+  const file = await request.file();
+  const fields = file?.fields as unknown as {
+    [key in keyof TransactionBodyData]: { value: TransactionBodyData[key] };
+  };
+
+  let params;
+  let command;
+  let imageName;
   const db = request.server.mongo.db;
   const filter = new Filter();
 
   try {
+    if (file) {
+      imageName = `${uuid()}-${file.filename}`;
+      const buffer = await file.toBuffer();
+      params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: imageName,
+        Body: buffer,
+        ContentType: file.mimetype,
+      };
+
+      command = new PutObjectCommand(params);
+
+      await request.server.s3.send(command);
+    }
+
     if (!db) {
       return reply.status(500).send({ error: "Database not available" });
     }
 
     const transactionData = {
-      ...data,
-      note: filter.clean(note || ""),
-      date: new Date(date),
-      account: new ObjectId(account),
+      type: fields.type.value,
+      amount: fields.amount.value,
+      category: fields.category.value,
+      note: filter.clean(fields.note?.value || ""),
+      date: new Date(fields.date.value),
+      month: fields.month.value,
+      year: fields.year.value,
+      account: new ObjectId(fields.account.value),
+      imageName: imageName,
       createdBy: new ObjectId(userId),
     };
 
@@ -247,6 +276,8 @@ export const createTransaction = async (
       .status(201)
       .send({ transaction: result, message: "Inserted new transaction" });
   } catch (error) {
+    console.log(error);
+
     return reply.status(500).send({ error: "Transaction added unsuccessful" });
   }
 };

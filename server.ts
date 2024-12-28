@@ -1,5 +1,6 @@
 import "dotenv/config";
 import Fastify from "fastify";
+import fastifyMultipart from "@fastify/multipart";
 import fastifyCookie, { type FastifyCookieOptions } from "@fastify/cookie";
 import connectDB from "./database/connect.js";
 import fastifyJwt from "@fastify/jwt";
@@ -11,6 +12,8 @@ import transactionRoutes from "./routes/transaction.js";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;
+
+fastify.register(fastifyMultipart);
 
 fastify.register(fastifyCookie, {
   secret: process.env.COOKIE_SECRET,
