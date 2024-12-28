@@ -1,3 +1,4 @@
+import { DeleteObjectsCommand, DeleteObjectsRequest } from "@aws-sdk/client-s3";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ObjectId } from "mongodb";
 
@@ -55,17 +56,54 @@ export const deleteAccount = async (
   const { userId } = request.user;
   const db = request.server.mongo.db;
 
+  const accountObjectId = new ObjectId(id);
+  const userObjectId = new ObjectId(userId);
+
   try {
     if (!db) {
       return reply.status(500).send({ error: "Database not available" });
     }
 
-    const result = await db.collection("accounts").findOneAndDelete({
-      _id: new ObjectId(id),
-      createdBy: new ObjectId(userId),
+    const transactions = await db
+      .collection("transactions")
+      .find({
+        account: accountObjectId,
+        createdBy: userObjectId,
+      })
+      .toArray();
+
+    const params: DeleteObjectsRequest = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Delete: {
+        Objects: [],
+      },
+    };
+
+    for (const transaction of transactions) {
+      if (!transaction.imageName) continue;
+
+      const object = {
+        Key: transaction.imageName,
+      };
+      params.Delete?.Objects?.push(object);
+    }
+
+    const command = new DeleteObjectsCommand(params);
+    await request.server.s3.send(command);
+
+    const transactionsDeleted = await db.collection("transactions").deleteMany({
+      account: accountObjectId,
+      createdBy: userObjectId,
     });
 
-    return reply.status(200).send({ account: result });
+    const result = await db.collection("accounts").findOneAndDelete({
+      _id: accountObjectId,
+      createdBy: userObjectId,
+    });
+
+    return reply
+      .status(200)
+      .send({ account: result, transactions: transactionsDeleted });
   } catch (error) {
     return reply.status(500).send({ error: "Account deleted unsuccessful" });
   }
