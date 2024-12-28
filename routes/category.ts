@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { authMiddleware } from "../middlewares/auth";
-import { createCategory, deleteCategory } from "../controllers/category";
+import { authMiddleware } from "../middlewares/auth.js";
+import { createCategory, deleteCategory } from "../controllers/category.js";
 
 const categoryRoutes = async (fastify: FastifyInstance) => {
   fastify.addHook("onRequest", authMiddleware);

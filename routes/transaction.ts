@@ -1,10 +1,10 @@
 import { FastifyInstance } from "fastify";
-import { authMiddleware } from "../middlewares/auth";
+import { authMiddleware } from "../middlewares/auth.js";
 import {
   createTransaction,
   getAllTransactions,
   getSummary,
-} from "../controllers/transaction";
+} from "../controllers/transaction.js";
 
 const transactionRoutes = async (fastify: FastifyInstance) => {
   fastify.addHook("onRequest", authMiddleware);

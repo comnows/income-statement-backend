@@ -1,13 +1,13 @@
 import "dotenv/config";
 import Fastify from "fastify";
 import fastifyCookie, { type FastifyCookieOptions } from "@fastify/cookie";
-import connectDB from "./database/connect";
+import connectDB from "./database/connect.js";
 import fastifyJwt from "@fastify/jwt";
-import authRoutes from "./routes/auth";
-import { createIndexes } from "./database/users";
-import accountRoutes from "./routes/account";
-import categoryRoutes from "./routes/category";
-import transactionRoutes from "./routes/transaction";
+import authRoutes from "./routes/auth.js";
+import { createIndexes } from "./database/users.js";
+import accountRoutes from "./routes/account.js";
+import categoryRoutes from "./routes/category.js";
+import transactionRoutes from "./routes/transaction.js";
 
 const fastify = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3000;

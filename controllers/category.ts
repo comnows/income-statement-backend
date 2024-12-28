@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ObjectId } from "mongodb";
-import { ParamsId } from "../libs/type";
+import { ParamsId } from "../libs/type.js";
 
 type CategoryData = {
   name: string;

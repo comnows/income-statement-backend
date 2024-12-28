@@ -12,4 +12,4 @@ const connectDB = async (fastify: FastifyInstance) => {
   console.log("Connected to database");
 };
 
-export = fastifyPlugin(connectDB);
+export default fastifyPlugin(connectDB);
