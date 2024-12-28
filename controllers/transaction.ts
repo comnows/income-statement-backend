@@ -257,12 +257,12 @@ export const createTransaction = async (
 
     const transactionData = {
       type: fields.type.value,
-      amount: fields.amount.value,
+      amount: Number(fields.amount.value),
       category: fields.category.value,
       note: filter.clean(fields.note?.value || ""),
       date: new Date(fields.date.value),
-      month: fields.month.value,
-      year: fields.year.value,
+      month: Number(fields.month.value),
+      year: Number(fields.year.value),
       account: new ObjectId(fields.account.value),
       imageName: imageName,
       createdBy: new ObjectId(userId),
