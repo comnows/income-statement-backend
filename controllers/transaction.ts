@@ -1,3 +1,4 @@
+import { Filter } from "bad-words";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ObjectId } from "mongodb";
 
@@ -221,8 +222,9 @@ export const createTransaction = async (
   reply: FastifyReply
 ) => {
   const { userId } = request.user;
-  const { account, date, ...data } = request.body;
+  const { account, date, note, ...data } = request.body;
   const db = request.server.mongo.db;
+  const filter = new Filter();
 
   try {
     if (!db) {
@@ -231,6 +233,7 @@ export const createTransaction = async (
 
     const transactionData = {
       ...data,
+      note: filter.clean(note || ""),
       date: new Date(date),
       account: new ObjectId(account),
       createdBy: new ObjectId(userId),
