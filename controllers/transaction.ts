@@ -72,14 +72,16 @@ export const getAllTransactions = async (
   request: FastifyRequest<GetAllTransactionRequestData>,
   reply: FastifyReply
 ) => {
+  const allowOffsets = [10, 20, 50, 100];
   const { userId } = request.user;
   const page = Number(request.query.page) || 1;
-  const offset = Number(request.query.offset) || 10;
+  let offset = Number(request.query.offset) || 10;
   const { month, year, account, category } = request.query;
   const db = request.server.mongo.db;
   const transactionFilter: TransactionFilter = {
     createdBy: new ObjectId(userId),
   };
+  offset = allowOffsets.includes(offset) ? offset : 10;
 
   try {
     if (!db) {
