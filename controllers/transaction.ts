@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ObjectId } from "mongodb";
 
-type TransactionQuerystring = {
+type PaginationQuerystring = {
   page?: string;
   offset?: string;
 };
@@ -21,7 +21,7 @@ type TransactionFilter = Pick<TransactionFilterQuery, "category"> & {
 };
 
 type GetAllTransactionRequestData = {
-  Querystring: TransactionQuerystring & TransactionFilterQuery;
+  Querystring: PaginationQuerystring & TransactionFilterQuery;
   Body: TransactionFilterQuery;
 };
 
@@ -32,7 +32,7 @@ type SummaryFilterQuery = {
   endYear?: string;
   account?: string;
   category?: string;
-};
+} & PaginationQuerystring;
 
 type GetSummaryRequestData = {
   Querystring: SummaryFilterQuery;
@@ -125,13 +125,17 @@ export const getSummary = async (
   request: FastifyRequest<GetSummaryRequestData>,
   reply: FastifyReply
 ) => {
+  const allowOffsets = [10, 20, 50, 100];
   const { userId } = request.user;
   const { startMonth, endMonth, startYear, endYear, account, category } =
     request.query;
+  const page = Number(request.query.page) || 1;
+  let offset = Number(request.query.offset) || 10;
   const db = request.server.mongo.db;
   const summaryFilter: SummaryFilter = {};
   const start: StartYearMonthFilter = {};
   const end: EndYearMonthFilter = {};
+  offset = allowOffsets.includes(offset) ? offset : 10;
 
   try {
     if (!db) {
@@ -192,6 +196,8 @@ export const getSummary = async (
         {
           $sort: { _id: -1 },
         },
+        { $skip: (page - 1) * offset },
+        { $limit: offset },
         {
           $project: {
             _id: 0,
