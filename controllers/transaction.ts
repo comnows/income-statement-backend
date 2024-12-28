@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Filter } from "bad-words";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ObjectId } from "mongodb";
@@ -113,6 +114,20 @@ export const getAllTransactions = async (
       .skip((page - 1) * offset)
       .limit(offset)
       .toArray();
+
+    for (const transaction of result) {
+      if (!transaction.imageName) continue;
+
+      const getObjectParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: transaction.imageName,
+      };
+      const command = new GetObjectCommand(getObjectParams);
+      const url = await getSignedUrl(request.server.s3, command, {
+        expiresIn: 3600,
+      });
+      transaction.imageUrl = url;
+    }
 
     return reply
       .status(200)
