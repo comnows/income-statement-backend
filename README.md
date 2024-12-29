@@ -7,8 +7,8 @@ understand their spending habit and planning their future finances.
 ### Project support features
 
 - Users can login and register their accounts
-- Can add and delete their bank account
-- Add and delete their transaction category
+- Can add, access and delete their bank account
+- Can add, access and delete their transaction category
 - Can access to all their transactions and create a new transaction with note and transaction slip image
 - Can access transaction summary
 - Can filter when access their transactions includes summary
