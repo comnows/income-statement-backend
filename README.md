@@ -4,6 +4,15 @@ Income Statement is providing REST API to income statement application that allo
 users to record their financial activities of their bank accounts, enable users to
 understand their spending habit and planning their future finances.
 
+### Project support features
+
+- Users can login and register their accounts
+- Can add and delete their bank account
+- Add and delete their transaction category
+- Can access to all their transactions and create a new transaction with note and transaction slip image
+- Can access transaction summary
+- Can filter when access their transactions includes summary
+
 ### Usage
 
 #### Install
