@@ -41,6 +41,31 @@ export const createCategory = async (
   }
 };
 
+export const getAllCategories = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const { userId } = request.user;
+  const db = request.server.mongo.db;
+
+  try {
+    if (!db) {
+      return reply.status(500).send({ error: "Database not available" });
+    }
+
+    const result = await db
+      .collection("categories")
+      .find({
+        createdBy: new ObjectId(userId),
+      })
+      .toArray();
+
+    return reply.status(200).send({ categories: result });
+  } catch (error) {
+    return reply.status(500).send({ error: "Category fetch unsuccessful" });
+  }
+};
+
 export const deleteCategory = async (
   request: FastifyRequest<DeleteCategoryRequestData>,
   reply: FastifyReply
