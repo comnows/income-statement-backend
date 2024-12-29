@@ -48,6 +48,31 @@ export const createAccount = async (
   }
 };
 
+export const getAllAccounts = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const { userId } = request.user;
+  const db = request.server.mongo.db;
+
+  try {
+    if (!db) {
+      return reply.status(500).send({ error: "Database not available" });
+    }
+
+    const result = await db
+      .collection("accounts")
+      .find({
+        createdBy: new ObjectId(userId),
+      })
+      .toArray();
+
+    return reply.status(200).send({ accounts: result });
+  } catch (error) {
+    return reply.status(500).send({ error: "Account fetch unsuccessful" });
+  }
+};
+
 export const deleteAccount = async (
   request: FastifyRequest<DeleteAccountRequestData>,
   reply: FastifyReply
